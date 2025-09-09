@@ -9,4 +9,4 @@ if location:
 	print(" Address:", location.address)
 	print(" Coordinates:", (location.latitude, location.longitude))
 else:
-	print("Location not found.")
+	print("Location not found")
