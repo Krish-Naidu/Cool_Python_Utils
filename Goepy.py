@@ -1,7 +1,7 @@
 geolocator = Nominatim(user_agent="geo_app")
 from geopy.geocoders import Nominatim
 
-location_name = input("Enter a location to geocode: ")
+location_name = input("Enter a location to geocode:")
 geolocator = Nominatim(user_agent="geo_app")
 location = geolocator.geocode(location_name)
 
