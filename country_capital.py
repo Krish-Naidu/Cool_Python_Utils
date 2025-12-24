@@ -14,6 +14,7 @@ countries = {
 user_input = input("Enter a country name: ")
 
 if user_input in countries:
-    print(user_input)
+    capital = countries[user_input]
+    print(capital)
 else:
     print("is not in the database.")
