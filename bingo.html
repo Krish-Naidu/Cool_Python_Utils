@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-section {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .current-number {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .current-number.new-number {
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        #drawButton {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            font-size: 1.5em;
+            padding: 20px 40px;
+        }
+
+        #drawButton:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        #drawButton:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #resetButton {
+            background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+        }
+
+        #resetButton:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .stats span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .right-section {
+            flex: 2;
+        }
+
+        .board-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .bingo-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .number-cell {
+            aspect-ratio: 1;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .number-cell.called {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: scale(0.95);
+        }
+
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-title {
+            text-align: center;
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            min-height: 80px;
+        }
+
+        .history-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .empty-message {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .game-section {
+                flex-direction: column;
+            }
+
+            .bingo-board {
+                grid-template-columns: repeat(10, 1fr);
+            }
+
+            .current-number {
+                width: 200px;
+                height: 200px;
+                font-size: 5em;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bingo-board {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 6px;
+                padding: 15px;
+            }
+
+            .number-cell {
+                font-size: 1em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .current-number {
+                width: 150px;
+                height: 150px;
+                font-size: 4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎱 BINGO 🎱</h1>
+        
+        <div class="game-section">
+            <div class="left-section">
+                <div class="current-number" id="currentNumber">-</div>
+                
+                <div class="controls">
+                    <button id="drawButton">Draw Number</button>
+                    <button id="resetButton">Reset Game</button>
+                </div>
+
+                <div class="stats">
+                    Numbers Called: <span id="callCount">0</span> / 99
+                </div>
+            </div>
+
+            <div class="right-section">
+                <div class="board-title">Bingo Board (1-99)</div>
+                <div class="bingo-board" id="bingoBoard"></div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-title">Call History</div>
+            <div class="history-list" id="historyList">
+                <div class="empty-message">No numbers called yet</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let calledNumbers = new Set();
+        let availableNumbers = [];
+        let callHistory = [];
+
+        // Initialize the game
+        function initGame() {
+            // Create bingo board
+            const board = document.getElementById('bingoBoard');
+            board.innerHTML = '';
+            
+            for (let i = 1; i <= 99; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'number-cell';
+                cell.textContent = i;
+                cell.id = `cell-${i}`;
+                board.appendChild(cell);
+            }
+
+            // Reset available numbers
+            availableNumbers = [];
+            for (let i = 1; i <= 99; i++) {
+                availableNumbers.push(i);
+            }
+
+            // Reset state
+            calledNumbers.clear();
+            callHistory = [];
+            
+            // Reset display
+            document.getElementById('currentNumber').textContent = '-';
+            document.getElementById('callCount').textContent = '0';
+            document.getElementById('historyList').innerHTML = '<div class="empty-message">No numbers called yet</div>';
+            
+            // Enable draw button
+            document.getElementById('drawButton').disabled = false;
+        }
+
+        // Draw a random number
+        function drawNumber() {
+            if (availableNumbers.length === 0) {
+                alert('All numbers have been called! 🎉');
+                return;
+            }
+
+            // Get random number from available numbers
+            const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+            const number = availableNumbers[randomIndex];
+            
+            // Remove from available numbers
+            availableNumbers.splice(randomIndex, 1);
+            
+            // Add to called numbers
+            calledNumbers.add(number);
+            callHistory.unshift(number);
+
+            // Update display
+            updateDisplay(number);
+            
+            // Mark on board
+            const cell = document.getElementById(`cell-${number}`);
+            cell.classList.add('called');
+
+            // Check if all numbers called
+            if (availableNumbers.length === 0) {
+                document.getElementById('drawButton').disabled = true;
+                setTimeout(() => {
+                    alert('🎉 All numbers have been called! Game complete!');
+                }, 500);
+            }
+        }
+
+        // Update the display
+        function updateDisplay(number) {
+            // Update current number with animation
+            const currentNumberDiv = document.getElementById('currentNumber');
+            currentNumberDiv.classList.remove('new-number');
+            
+            // Force reflow to restart animation
+            void currentNumberDiv.offsetWidth;
+            
+            currentNumberDiv.textContent = number;
+            currentNumberDiv.classList.add('new-number');
+
+            // Update count
+            document.getElementById('callCount').textContent = calledNumbers.size;
+
+            // Update history
+            updateHistory();
+        }
+
+        // Update history display
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            if (callHistory.length === 0) {
+                historyList.innerHTML = '<div class="empty-message">No numbers called yet</div>';
+                return;
+            }
+
+            callHistory.forEach(num => {
+                const historyNum = document.createElement('div');
+                historyNum.className = 'history-number';
+                historyNum.textContent = num;
+                historyList.appendChild(historyNum);
+            });
+        }
+
+        // Event listeners
+        document.getElementById('drawButton').addEventListener('click', drawNumber);
+        document.getElementById('resetButton').addEventListener('click', () => {
+            if (calledNumbers.size > 0) {
+                if (confirm('Are you sure you want to reset the game?')) {
+                    initGame();
+                }
+            } else {
+                initGame();
+            }
+        });
+
+        // Keyboard shortcut (spacebar to draw)
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !document.getElementById('drawButton').disabled) {
+                e.preventDefault();
+                drawNumber();
+            }
+        });
+
+        // Initialize on load
+        initGame();
+    </script>
+</body>
+</html>
